@@ -9,7 +9,7 @@ const char UNAME[] = "user";
 void run_command(const char *name){
 	char path[256];
 	snprintf(path, sizeof(path), "../bin/%s/%s", name, name);
-	if (access (path))
+	if (access (path, F_OK) != -1)
 }
 
 void shell_input(){

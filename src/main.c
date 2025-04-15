@@ -57,14 +57,17 @@ uint8_t login(UserSession *new_session){
 		fgets(passwd_inp, sizeof(passwd_inp), stdin);
 	}
 
-	if (try_login(uname_inp, passwd_inp, new_session) == 1){
+	uint8_t tester = try_login(uname_inp, passwd_inp, new_session);
+	if (tester == 1){
+		snprintf(new_session->uname, sizeof(new_session->uname), "%s", uname_inp);
+		new_session->logged = true;
 		return 1;
 	} else {
 		return 0;
 	}
 }
 
-void run_command(const char *name){
+uint8_t run_command(const char *name){
 	char path[256];
 	pid_t pid = fork();
 	snprintf(path, sizeof(path), "../bin/%s/%s", name, name);
@@ -72,13 +75,15 @@ void run_command(const char *name){
 		if (pid == 0) {
 			execl(path, name, NULL);
 			perror("execution failed");
-			exit(1);
+			exit(1); // don't touch this stuff at the moment
 		} else {
 			int status;
 			waitpid(pid, &status, 0);
+			return 1; // cork
 		}
 		//printf("wsh: command found, do nothing\n");
 	} else {
+		return 1; //cork
 		printf("wsh: Command not found, unfortunately =(\n");
 	}
 }
@@ -95,8 +100,10 @@ void shell_input(UserSession* new_session){
 			printf("Goodbye!");
 		} else {
 			printf("You have entered: %s\n", input);
-			run_command(input);
-			shell_input(new_session); //recursive call of this function, which means that it is always in input status
+			uint8_t a = run_command(input);
+			if (a == 1){
+				shell_input(new_session); 
+			}//recursive call of this function, which means that it is always in input status
 		}
 	} else {
 		shell_input(new_session);

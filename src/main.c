@@ -69,9 +69,10 @@ uint8_t login(UserSession *new_session){
 
 uint8_t run_command(const char *name){
 	char path[256];
-	pid_t pid = fork();
+	//pid_t pid = fork();
 	snprintf(path, sizeof(path), "../bin/%s/%s", name, name);
 	if (access (path, F_OK) != -1 && access(path, R_OK) != -1){ // R_OK?
+		pid_t pid = fork();
 		if (pid == 0) {
 			execl(path, name, NULL);
 			perror("execution failed");
@@ -83,8 +84,9 @@ uint8_t run_command(const char *name){
 		}
 		//printf("wsh: command found, do nothing\n");
 	} else {
+		printf("wsh: Command not found\n");
 		return 1; //cork
-		printf("wsh: Command not found, unfortunately =(\n");
+		//printf("wsh: Command not found, unfortunately =(\n");
 	}
 }
 
@@ -94,7 +96,7 @@ void shell_input(UserSession* new_session){
 	fgets(input, sizeof(input), stdin);
 	input[strcspn(input, "\n")]=0;
 	if(strcmp(input, "")!=0){ 
-	if(strcmp(input, "exit")==0){
+		if(strcmp(input, "exit")==0){
 			memset(new_session->uname, 0, sizeof(new_session->uname) );
 			new_session->logged = false;
 			printf("Goodbye!");

@@ -101,7 +101,7 @@ void shell_input(UserSession* new_session){
 			new_session->logged = false;
 			printf("Goodbye!");
 		} else {
-			printf("You have entered: %s\n", input);
+		//	printf("You have entered: %s\n", input);
 			uint8_t a = run_command(input);
 			if (a == 1){
 				shell_input(new_session); 

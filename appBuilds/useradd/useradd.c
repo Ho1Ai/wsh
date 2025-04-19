@@ -9,7 +9,7 @@ typedef struct {
 	char path[256];
 	char passwd[64];
 	//int groups; //not used at the moment
-} NewUser;
+} NewUser; // why did I add this stuff if I still don't use it, lmao?
 
 /* Groups:
  * 1. video (group for terminal and other users)

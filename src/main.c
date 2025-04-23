@@ -7,10 +7,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define MAX_INP_SIZE 64
 #define MAX_UNAME_LINE 128
 #define MAX_PASSWD_LINE 64
 
 //const char UNAME[] = "user";
+
+char* currentPath = "./";
 
 typedef struct {
 	char uname[MAX_UNAME_LINE]; //128 maybe?
@@ -67,7 +70,7 @@ uint8_t login(UserSession *new_session){
 	}
 }
 
-uint8_t run_command(const char *name){
+uint8_t run_command(const char *name /*, const char* args_list*/){
 	char path[256];
 	//pid_t pid = fork();
 	snprintf(path, sizeof(path), "../bin/%s/%s", name, name);
@@ -91,12 +94,58 @@ uint8_t run_command(const char *name){
 }
 
 void shell_input(UserSession* new_session){
-	char input[256];
+	char input[MAX_INP_SIZE];
 	printf("[wsh@%s] >> ", new_session->uname);
-	fgets(input, sizeof(input), stdin);
-	input[strcspn(input, "\n")]=0;
+	if(fgets(input, MAX_INP_SIZE, stdin)==NULL) {
+		new_session->logged = false;
+		printf("^D");
+		printf("\nGoodbye!");
+		return;
+	};
+	input[strcspn(input, "\n")]='\0';
+	
+	char* final_input;
+
+	int arg_number = 0;
+	int last_arg_end = 0;
+
+	int new_last_arg_index = 0;
+
+	char tester[256][256];
+
+	//strncpy(tester[0], input, 5);
+	
+	//printf("%d", (sizeof(input)/sizeof(input[0])));
+
+	for (int i = 0; i < sizeof(input)/sizeof(input[0]); i++) {
+		if(input[i] != '\0'){
+			//strncpy(tester[arg_number], input+last_arg_end, i);
+			//printf("%c", input[i]);	
+			if (input[i] == ' '){
+				last_arg_end+=(i+1);
+				strncpy(tester[arg_number], input+last_arg_end, 1);
+				arg_number++;
+				continue;
+			} else {
+				new_last_arg_index++;
+				//printf("%c",input[i]);
+				//strncpy(tester[arg_number], input+last_arg_end+i, 0); // I don't even know, why is it 0, but it works only in this way
+			}
+		} else {
+			break;
+		}
+	}
+
+	printf("%s", tester[1]);
+
+	//printf("%s", tester[0]);
+
+	/*for (int i = 0; i < arg_number; i++) {
+		printf("%s", final_input[i]);
+	}*/
+
 	if(strcmp(input, "")!=0){ 
-		if(strcmp(input, "exit")==0){
+		if(strcmp(input, "exit")==0 || input == NULL){ // yeah, I am very lazy to use it in different file (e.g. exit.c)
 			memset(new_session->uname, 0, sizeof(new_session->uname) );
 			new_session->logged = false;
 			printf("Goodbye!");
@@ -119,5 +168,6 @@ int main() {
 	if (new_session->logged == true) {
 		shell_input(new_session);
 	}
+	free(new_session);
 	return 0;
 }

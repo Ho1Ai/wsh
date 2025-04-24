@@ -1,7 +1,12 @@
 #include <stdio.h>
+#include <string.h>
 
-int main(const char* final_object_path){
-	char* final_object_path	= "./final.js";
-	FILE* file = fopen(final_object_path, "w");
-	fclose(file);
+int main(int argc, char** argv){
+	printf("%s\t%d", argv[1], argc);
+	char* final_object_path;
+	snprintf(final_object_path, 256, "./%s", argv[1]);
+	printf("%s", final_object_path);
+	//	FILE* file = fopen(final_object_path, "w");
+	//	fclose(file);
+	FILE* endpoint = fopen(final_object_path, "w");
 }

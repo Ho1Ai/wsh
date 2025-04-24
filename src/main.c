@@ -7,7 +7,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX_INP_SIZE 64
+#define MAX_INP_SIZE 320
+#define MAX_ARG_COUNT 128
 #define MAX_UNAME_LINE 128
 #define MAX_PASSWD_LINE 64
 
@@ -70,14 +71,15 @@ uint8_t login(UserSession *new_session){
 	}
 }
 
-uint8_t run_command(const char *name /*, const char* args_list*/){
+uint8_t run_command(char **arg_parser /*, const char* args_list*/){
 	char path[256];
 	//pid_t pid = fork();
-	snprintf(path, sizeof(path), "../bin/%s/%s", name, name);
+	snprintf(path, sizeof(path), "../bin/%s/%s", arg_parser[0], arg_parser[0]);
+	//printf("%s %s", path, arg_parser[0]);
 	if (access (path, F_OK) != -1 && access(path, R_OK) != -1){ // R_OK?
 		pid_t pid = fork();
 		if (pid == 0) {
-			execl(path, name, NULL);
+			execl(path, arg_parser[0], NULL);
 			perror("execution failed");
 			exit(1); // don't touch this stuff at the moment
 		} else {
@@ -95,6 +97,9 @@ uint8_t run_command(const char *name /*, const char* args_list*/){
 
 void shell_input(UserSession* new_session){
 	char input[MAX_INP_SIZE];
+	char* t_args[MAX_ARG_COUNT];
+
+	int arg_count = 0;
 	printf("[wsh@%s] >> ", new_session->uname);
 	if(fgets(input, MAX_INP_SIZE, stdin)==NULL) {
 		new_session->logged = false;
@@ -104,53 +109,23 @@ void shell_input(UserSession* new_session){
 	};
 	input[strcspn(input, "\n")]='\0';
 	
-	char* final_input;
+	char* getter = strtok(input, " ");
 
-	int arg_number = 0;
-	int last_arg_end = 0;
-
-	int new_last_arg_index = 0;
-
-	char tester[256][256];
-
-	//strncpy(tester[0], input, 5);
+	while(getter != NULL && arg_count < MAX_ARG_COUNT) {
+		t_args[arg_count++] = getter;
+		getter = strtok(NULL, " ");
+	} // yeah, only after 3 days of trying to fix it I asked ChatGPT to help me, lol. I didn't know about strtok
+	t_args[arg_count+1] = NULL; 
+	//printf("%s", getter[0]);
+	//printf("%s", t_args[0]);
 	
-	//printf("%d", (sizeof(input)/sizeof(input[0])));
-
-	for (int i = 0; i < sizeof(input)/sizeof(input[0]); i++) {
-		if(input[i] != '\0'){
-			//strncpy(tester[arg_number], input+last_arg_end, i);
-			//printf("%c", input[i]);	
-			if (input[i] == ' '){
-				last_arg_end+=(i+1);
-				strncpy(tester[arg_number], input+last_arg_end, 1);
-				arg_number++;
-				continue;
-			} else {
-				new_last_arg_index++;
-				//printf("%c",input[i]);
-				//strncpy(tester[arg_number], input+last_arg_end+i, 0); // I don't even know, why is it 0, but it works only in this way
-			}
-		} else {
-			break;
-		}
-	}
-
-	printf("%s", tester[1]);
-
-	//printf("%s", tester[0]);
-
-	/*for (int i = 0; i < arg_number; i++) {
-		printf("%s", final_input[i]);
-	}*/
-
 	if(strcmp(input, "")!=0){ 
 		if(strcmp(input, "exit")==0 || input == NULL){ // yeah, I am very lazy to use it in different file (e.g. exit.c)
 			memset(new_session->uname, 0, sizeof(new_session->uname) );
 			new_session->logged = false;
 			printf("Goodbye!");
 		} else {
-			uint8_t a = run_command(input);
+			uint8_t a = run_command(t_args);
 			if (a == 1){
 				shell_input(new_session); 
 			}//recursive call of this function, which means that it is always in input status

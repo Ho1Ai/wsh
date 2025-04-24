@@ -5,7 +5,16 @@
 	#define MAX_FILENAME_LEN 256 
 #endif
 
-int main(int argc, char** argv){
+/* Args order:
+ *
+ * 0. executed command
+ * 1. pwd (current location) from main.c (I mean wsh)
+ * 2. touch arg number 1
+ * etc. which is not used
+ * 
+ */
+
+int main(int argc, char** argv){ 
 	if(argv[2] == NULL) {
 		printf("An error occured: not enough arguments (filename) to execute touch command\n");
 	} else {

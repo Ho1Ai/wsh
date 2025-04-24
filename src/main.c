@@ -74,12 +74,13 @@ uint8_t login(UserSession *new_session){
 uint8_t run_command(char **arg_parser /*, const char* args_list*/){
 	char path[256];
 	//pid_t pid = fork();
-	snprintf(path, sizeof(path), "../bin/%s/%s", arg_parser[0], arg_parser[0]);
+	snprintf(path, sizeof(path), "../bin/%s/%s", arg_parser[1], arg_parser[1]);
+	printf("%s\n\n",path);
 	//printf("%s %s", path, arg_parser[0]);
 	if (access (path, F_OK) != -1 && access(path, R_OK) != -1){ // R_OK?
 		pid_t pid = fork();
 		if (pid == 0) {
-			execl(path, arg_parser[0], NULL);
+			execv(path, arg_parser);
 			perror("execution failed");
 			exit(1); // don't touch this stuff at the moment
 		} else {
@@ -111,11 +112,13 @@ void shell_input(UserSession* new_session){
 	
 	char* getter = strtok(input, " ");
 
+	t_args[arg_count++] = currentPath;//by default we use our current pwd
+
 	while(getter != NULL && arg_count < MAX_ARG_COUNT) {
 		t_args[arg_count++] = getter;
 		getter = strtok(NULL, " ");
 	} // yeah, only after 3 days of trying to fix it I asked ChatGPT to help me, lol. I didn't know about strtok
-	t_args[arg_count+1] = NULL; 
+	t_args[arg_count++] = NULL; 
 	//printf("%s", getter[0]);
 	//printf("%s", t_args[0]);
 	

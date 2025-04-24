@@ -1,12 +1,24 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef MAX_FILENAME_LEN
+	#define MAX_FILENAME_LEN 256 
+#endif
+
 int main(int argc, char** argv){
-	printf("%s\t%d", argv[1], argc);
-	char* final_object_path;
-	snprintf(final_object_path, 256, "./%s", argv[1]);
-	printf("%s", final_object_path);
-	//	FILE* file = fopen(final_object_path, "w");
-	//	fclose(file);
-	FILE* endpoint = fopen(final_object_path, "w");
+	if(argv[2] == NULL) {
+		printf("An error occured: not enough arguments (filename) to execute touch command\n");
+	} else {
+		//printf("%s\t%d", argv[2], argc);
+		char final_object_path[MAX_FILENAME_LEN];
+		snprintf(final_object_path, sizeof(final_object_path), "./%s", argv[2]);
+		//printf("%s", final_object_path);
+		//	FILE* file = fopen(final_object_path, "w");
+		//	fclose(file);
+		FILE* file = fopen(final_object_path,"r");
+		if(!file){
+			FILE* endpoint = fopen(final_object_path, "w");
+			fclose(endpoint);
+		}
+	}
 }

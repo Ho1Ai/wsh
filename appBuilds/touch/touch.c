@@ -20,10 +20,15 @@ int main(int argc, char** argv){
 	} else {
 		//printf("%s\t%d", argv[2], argc);
 		char final_object_path[MAX_FILENAME_LEN];
-		snprintf(final_object_path, sizeof(final_object_path), "./%s", argv[2]);
+		char* slash_tester = strchr(argv[2], '/');
+		if(slash_tester != NULL){
+			printf("An error occured. There are '/' symbols in the name of your file. Write touch --help to check some more info");
+		}
+		snprintf(final_object_path, sizeof(final_object_path), "%s%s", argv[0], argv[2]);
 		//printf("%s", final_object_path);
 		//	FILE* file = fopen(final_object_path, "w");
 		//	fclose(file);
+		//printf("%s\n", final_object_path); //verbose debug
 		FILE* file = fopen(final_object_path,"r");
 		if(!file){
 			FILE* endpoint = fopen(final_object_path, "w");

@@ -6,3 +6,4 @@ WaxusBS Shell
 - Since today and until I notify you all wsh is freezed. I'm gonna update only useradd command. Wsh can't be used at the moment in my system so I need some things for it. It is the only reason why I decided to freeze development
 - rm, rmdir - added to wsh
 - fixed: ls, cd, touch, mkdir
+2025/04/28 (approximately 19:10) - 00009p1s - fixed % symbol in the end by adding \n in the end of outputs after exit command

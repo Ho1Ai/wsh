@@ -222,7 +222,7 @@ void shell_input(UserSession* new_session){
 	if(fgets(input, MAX_INP_SIZE, stdin)==NULL) {
 		new_session->logged = false;
 		printf("^D");
-		printf("\nGoodbye!");
+		printf("\nGoodbye!\n");
 		return;
 	};
 	input[strcspn(input, "\n")]='\0';
@@ -249,7 +249,7 @@ void shell_input(UserSession* new_session){
 		if(strcmp(input, "exit")==0){ // yeah, I am very lazy to use it in different file (e.g. exit.c)
 			memset(new_session->uname, 0, sizeof(new_session->uname) );
 			new_session->logged = false;
-			printf("Goodbye!");
+			printf("Goodbye!\n");
 		} else {
 			if (!changing_dir){
 				uint8_t a = run_command(t_args);

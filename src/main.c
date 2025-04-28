@@ -143,28 +143,59 @@ void cd(char** args_list){
 			}
 
 			//printf("%d", strlen(new_arg));
-			
-			snprintf(final_path, sizeof(final_path), "%s%s/", args_list[0], new_arg);
+//			printf("%s",args_list[0]);
+			//printf("%c", args_list[0][strlen(args_list[0])-1]);
+			if(args_list[0][strlen(args_list[0])-1] == '/'){
+				snprintf(final_path, sizeof(final_path), "%s%s/", args_list[0], new_arg);
+			//printf("%s", final_path);
+			} else {
+			snprintf(final_path, sizeof(final_path), "%s/%s/", args_list[0], new_arg);
+			}
 		} else {
 			snprintf(final_path, sizeof(final_path), "%s", args_list[0]);
 			if(final_path[strlen(final_path)-1] == '/' && strcmp(final_path,"./") !=0) {
 				final_path[strlen(final_path)-1] = '\0';
 				char* last_slash_ptr = strrchr(final_path, '/');
+				
+				//printf("%s\n%p\n", final_path, last_slash_ptr);
+				*last_slash_ptr = '\0';
+			} else if (strcmp(final_path, "./")!=0) {
+				char* last_slash_ptr = strrchr(final_path, '/');
+				//printf("%p\n", last_slash_ptr);
 				*last_slash_ptr = '\0';
 			}
 
-			if(strlen(final_path) == 1) {
+			if(strlen(final_path) <= 1) {
 				snprintf(final_path, sizeof(final_path), "./");
 			}
 		}
 	
 		//printf("%s", final_path);
-		DIR* test_dir = opendir(args_list[2]);
-		if(!test_dir) {
-			printf("An error occured: no such file or directory. \n");
-		} else {
-			closedir(test_dir);
-			current_path = final_path;
+		//printf("before if");
+		//if(current_path[strlen(current_path)-1] == '/'){
+			DIR* test_dir = opendir(final_path);
+			if(!test_dir) {
+				printf("An error occured: no such file or directory. \n");
+			} else {
+				closedir(test_dir);
+				//if(final_path[strlen(final_path)-1]!='/')
+					//snprintf(final_path, sizeof(final_path), "%s/", final_path);
+//				printf(final_path);
+				current_path = final_path;
+		//	}
+		//} else {
+		//	printf("nothing good\n");
+		//	char* new_path = strcat("/", args_list[2]);
+		//	printf("nothing good x2\n");
+		//	printf("%s\n", new_path);
+		//	DIR* test_dir = opendir(new_path);
+		//	if(!test_dir) {
+		//		printf("An error occured: no such file or directory.\n");
+		//	} else {
+		//		closedir(test_dir);
+		//		snprintf(final_path, sizeof(final_path), "%s%s", args_list[0], new_path);
+		//		current_path = final_path;
+		//	}
 		}
 	} else {
 		current_path = "./";
